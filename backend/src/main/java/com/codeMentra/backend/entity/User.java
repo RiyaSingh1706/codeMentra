@@ -50,4 +50,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(columnDefinition = "INTEGER DEFAULT 60")
+    private Integer dailyGoalMinutes = 60;
+
 }
