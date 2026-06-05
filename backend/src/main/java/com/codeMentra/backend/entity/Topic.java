@@ -3,6 +3,7 @@ package com.codeMentra.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,16 @@ public class Topic {
     @JoinColumn(name = "parent_id")
     private Topic parentTopic;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parentTopic")
-    private List<Topic> subTopics;
+    private List<Topic> subTopics = new ArrayList<>();
+
+    // Problem relation
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "topic",
+            cascade = CascadeType.ALL
+    )
+    private List<ProblemTopic> problemTopics = new ArrayList<>();
+
 }

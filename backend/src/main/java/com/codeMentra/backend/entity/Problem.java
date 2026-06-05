@@ -47,10 +47,16 @@ public class Problem {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    private List<ProblemTopic> problemTopics = new ArrayList<>();
+    private Set<ProblemTopic> problemTopics = new HashSet<>();
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     private List<ProblemCompany> problemCompanies = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "problem")
+    private List<UserProblemActivity> userActivities = new ArrayList<>();
 }

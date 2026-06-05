@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -53,4 +54,12 @@ public class User {
     @Column(columnDefinition = "INTEGER DEFAULT 60")
     private Integer dailyGoalMinutes = 60;
 
+    @OneToMany(mappedBy = "user")
+    private List<UserProblemActivity> activities;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserTopicScores> topicScores;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserTargetCompany> targetCompanies;
 }
