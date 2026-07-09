@@ -76,10 +76,10 @@ To build an AI-powered coding mentor that helps learners prepare for technical i
 * Entity Modeling
 * Domain Architecture
 * PostgreSQL Integration
+* JWT Authentication and Authorization
 
 **Upcoming Features**
 
-* JWT Authentication and Authorization
 * AI Hint Generation
 * Personalized Recommendation Engine
 * AI Code Review and Optimization
