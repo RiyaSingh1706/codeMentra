@@ -28,6 +28,4 @@ public class ProblemCompany {
     @JoinColumn(name = "company_Id")
     private Company company;
 
-    @Enumerated(EnumType.STRING)
-    private Popularity popularity;
 }
