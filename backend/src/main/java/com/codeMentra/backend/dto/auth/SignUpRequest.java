@@ -27,5 +27,5 @@ public class SignUpRequest {
 
     private PreferredLanguage preferredLanguage;
 
-    private Platform preferedPlatform;
+    private Platform platform;
 }

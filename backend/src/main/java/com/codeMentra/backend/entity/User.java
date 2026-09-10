@@ -51,6 +51,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Builder.Default
     @Column(columnDefinition = "INTEGER DEFAULT 60")
     private Integer dailyGoalMinutes = 60;
 

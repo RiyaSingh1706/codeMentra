@@ -41,7 +41,7 @@ public class AuthService {
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .preferredLanguage(request.getPreferredLanguage())
-                .platform(request.getPreferedPlatform())
+                .platform(request.getPlatform())
                 .build();
 
         userRepository.save(user);
