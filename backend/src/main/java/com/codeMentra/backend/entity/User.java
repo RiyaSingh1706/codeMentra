@@ -63,4 +63,10 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<UserTargetCompany> targetCompanies;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isEmailVerified = false;
+
+    private String verificationToken;
 }

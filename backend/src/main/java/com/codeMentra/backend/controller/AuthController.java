@@ -16,10 +16,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody SignUpRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody SignUpRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<VerifyResponse> verify(@RequestParam String token) {
+        return ResponseEntity.ok(authService.verifyEmail(token));
+    }
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));

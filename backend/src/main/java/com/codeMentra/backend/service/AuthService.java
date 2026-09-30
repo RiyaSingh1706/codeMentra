@@ -8,9 +8,12 @@ import com.codeMentra.backend.repositories.RefreshTokenRepository;
 import com.codeMentra.backend.repositories.UserRepository;
 import com.codeMentra.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,13 +30,18 @@ public class AuthService {
     @org.springframework.beans.factory.annotation.Value("${jwt.refresh.expiration}")
     private long refreshExpirationMs;
 
-    public AuthResponse register(SignUpRequest request){
-        if(userRepository.existsByUsername(request.getUsername())){
+    private final EmailService emailService;
+
+    @Transactional
+    public RegisterResponse register(SignUpRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }
-        if(userRepository.existsByEmail(request.getEmail())){
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already registered");
         }
+
+        String verificationToken = UUID.randomUUID().toString();
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -42,24 +50,49 @@ public class AuthService {
                 .role(Role.USER)
                 .preferredLanguage(request.getPreferredLanguage())
                 .platform(request.getPlatform())
+                .isEmailVerified(false)
+                .verificationToken(verificationToken)
                 .build();
 
         userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), user.getUsername(), verificationToken);
 
-        return  buildAuthResponse(user);
+        return RegisterResponse.builder()
+                .message("Account created. Please check your email to verify your account before logging in.")
+                .email(user.getEmail())
+                .build();
     }
 
     @Transactional
-    public AuthResponse login(LoginRequest request){
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsernameOrEmail(
-                        request.getUsernameOrEmail(),request.getUsernameOrEmail())
-                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid credentials"));
+                        request.getUsernameOrEmail(), request.getUsernameOrEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-        if(!passwordEncoder.matches(request.getPassword(),user.getPasswordHash())){
-            throw new org.springframework.security.authentication.BadCredentialsException("Invalid credentials");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+
+        if (!Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Email not verified. Please check your inbox for the verification link.");
         }
 
         return buildAuthResponse(user);
+    }
+
+    @Transactional
+    public VerifyResponse verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired verification link"));
+
+        user.setIsEmailVerified(true);
+        user.setVerificationToken(null);
+        userRepository.save(user);
+
+        return VerifyResponse.builder()
+                .message("Email verified successfully. You can now log in.")
+                .build();
     }
 
     @Transactional
