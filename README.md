@@ -77,6 +77,7 @@ To build an AI-powered coding mentor that helps learners prepare for technical i
 * Domain Architecture
 * PostgreSQL Integration
 * JWT Authentication and Authorization
+* Pipeline
 
 **Upcoming Features**
 
